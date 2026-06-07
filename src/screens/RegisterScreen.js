@@ -4,45 +4,77 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { COUNTIES, CONSTITUENCIES, WARDS } from '../data/kenyaData';
-import { useElection } from '../context/ElectionContext';
+import { supabase } from '../lib/supabase';
 import { AppButton, Card, COLORS } from '../components/UI';
 
-export default function VerifyScreen({ navigation }) {
-  const { state, verifyVoter } = useElection();
+export default function RegisterScreen({ navigation }) {
   const [nationalId, setNationalId] = useState('');
   const [fullName, setFullName] = useState('');
   const [county, setCounty] = useState('');
   const [constituency, setConstituency] = useState('');
   const [ward, setWard] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const constituencies = county ? (CONSTITUENCIES[county] || []) : [];
   const wards = constituency ? (WARDS[constituency] || []) : [];
 
-  async function handleVerify() {
-    if (!nationalId.trim()) { Alert.alert('Error', 'Enter your National ID number.'); return; }
-    if (!fullName.trim()) { Alert.alert('Error', 'Enter your full name.'); return; }
-    if (!county) { Alert.alert('Error', 'Select your county.'); return; }
-    if (!constituency) { Alert.alert('Error', 'Select your constituency.'); return; }
-    if (!ward) { Alert.alert('Error', 'Select your ward.'); return; }
+  async function handleRegister() {
+    setError('');
+    if (!nationalId.trim()) { setError('Enter your National ID number.'); return; }
+    if (nationalId.trim().length < 6) { setError('ID must be at least 6 digits.'); return; }
+    if (!fullName.trim()) { setError('Enter your full name.'); return; }
+    if (!county) { setError('Select your county.'); return; }
+    if (!constituency) { setError('Select your constituency.'); return; }
+    if (!ward) { setError('Select your ward.'); return; }
 
-    const success = await verifyVoter(nationalId, fullName);
-    if (success) {
-      setNationalId(''); setFullName(''); setCounty(''); setConstituency(''); setWard('');
-      navigation.navigate('Ballot');
+    setLoading(true);
+    try {
+      const { data: existing } = await supabase
+        .from('voters')
+        .select('id')
+        .eq('national_id', nationalId.trim())
+        .single();
+
+      if (existing) {
+        setError('This ID is already registered. Proceed to verify and vote.');
+        setLoading(false);
+        return;
+      }
+
+      const { error: insertError } = await supabase.from('voters').insert({
+        national_id: nationalId.trim(),
+        full_name: fullName.trim(),
+        county,
+        constituency,
+        ward,
+      });
+
+      if (insertError) throw insertError;
+
+      Alert.alert(
+        'Registration Successful',
+        'You are now registered. Proceed to verify your identity and vote.',
+        [{ text: 'Proceed to Vote', onPress: () => navigation.navigate('Verify') }]
+      );
+    } catch (e) {
+      setError('Registration failed. Check your connection and try again.');
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-      <Text style={styles.title}>Voter Verification</Text>
-      <Text style={styles.subtitle}>Enter your details exactly as they appear on your National ID</Text>
+      <Text style={styles.title}>Voter Registration</Text>
+      <Text style={styles.subtitle}>Register to participate in the election. You only need to do this once.</Text>
       <Card>
         <Text style={styles.label}>National ID Number *</Text>
-        <TextInput style={styles.input} value={nationalId} onChangeText={setNationalId}
+        <TextInput style={styles.input} value={nationalId} onChangeText={v => { setNationalId(v); setError(''); }}
           placeholder="e.g. 28345671" keyboardType="numeric" maxLength={9}
           placeholderTextColor={COLORS.textLight} />
-        <Text style={styles.label}>Full Name (as on ID) *</Text>
-        <TextInput style={styles.input} value={fullName} onChangeText={setFullName}
+        <Text style={styles.label}>Full Name *</Text>
+        <TextInput style={styles.input} value={fullName} onChangeText={v => { setFullName(v); setError(''); }}
           placeholder="e.g. Jane Wanjiku Mwangi" autoCapitalize="words"
           placeholderTextColor={COLORS.textLight} />
         <Text style={styles.label}>County *</Text>
@@ -66,11 +98,11 @@ export default function VerifyScreen({ navigation }) {
             {wards.map(w => <Picker.Item key={w.id} label={w.name} value={w.id} />)}
           </Picker>
         </View>
-        {state.error ? <Text style={styles.error}>{state.error}</Text> : null}
-        <AppButton title={state.loading ? 'Verifying...' : 'Verify & Proceed to Ballot'}
-          onPress={handleVerify} loading={state.loading} style={{ marginTop: 8 }} />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <AppButton title={loading ? 'Registering...' : 'Register as Voter'}
+          onPress={handleRegister} loading={loading} style={{ marginTop: 12 }} />
       </Card>
-      <Text style={styles.note}>Your identity is verified but will not be linked to your vote choices.</Text>
+      <Text style={styles.note}>Already registered? <Text style={styles.link} onPress={() => navigation.navigate('Verify')}>Proceed to verify and vote</Text></Text>
     </ScrollView>
   );
 }
@@ -85,5 +117,6 @@ const styles = StyleSheet.create({
   pickerWrap: { borderWidth: 1, borderColor: COLORS.border, borderRadius: 8, backgroundColor: '#FAFAFA', overflow: 'hidden' },
   picker: { height: 50, color: COLORS.text },
   error: { color: COLORS.danger, fontSize: 13, marginTop: 8 },
-  note: { fontSize: 12, color: COLORS.textMuted, textAlign: 'center', marginTop: 16, lineHeight: 18 },
+  note: { fontSize: 13, color: COLORS.textMuted, textAlign: 'center', marginTop: 16 },
+  link: { color: COLORS.primary, fontWeight: '500' },
 });

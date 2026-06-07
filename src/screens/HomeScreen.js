@@ -39,7 +39,12 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <AppButton
-        title="Verify ID & Vote"
+        title="Register as Voter"
+        onPress={() => navigation.navigate('Register')}
+        style={{ marginBottom: 12 }}
+      />
+      <AppButton
+        title="Already Registered? Vote Now"
         onPress={() => navigation.navigate('Verify')}
         style={{ marginBottom: 12 }}
       />

@@ -10,6 +10,7 @@ import BallotScreen from './src/screens/BallotScreen';
 import ConfirmationScreen from './src/screens/ConfirmationScreen';
 import AdminPinScreen from './src/screens/AdminPinScreen';
 import AdminScreen from './src/screens/AdminScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,7 @@ export default function App() {
             }}
           >
             <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Kenya Elections 2024' }} />
+            <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Voter Registration' }} />
             <Stack.Screen name="Verify" component={VerifyScreen} options={{ title: 'Voter Verification' }} />
             <Stack.Screen name="Ballot" component={BallotScreen} options={{ title: 'Official Ballot', headerLeft: null }} />
             <Stack.Screen name="Confirmation" component={ConfirmationScreen} options={{ title: 'Vote Confirmed', headerLeft: null }} />
