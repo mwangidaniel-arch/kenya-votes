@@ -475,6 +475,16 @@ export function getCountyCandidates(countyId) {
   };
 }
 
+// County-level Women Representative candidates
+export function getWomenRepCandidates(countyId) {
+  const county = COUNTIES.find(c => c.id === countyId);
+  return [
+    { id: `${countyId}_wr1`, name: `Hon. Fatuma ${county.name} Ali`, party: 'PAK' },
+    { id: `${countyId}_wr2`, name: `Hon. Wanjiru ${county.name} Mwangi`, party: 'NUP' },
+    { id: `${countyId}_wr3`, name: `Hon. Aisha ${county.name} Hassan`, party: 'DFK' },
+  ];
+}
+
 // Constituency-level MP candidates
 export function getMPCandidates(constId) {
   const name = constId.replace(/_/g, ' ');

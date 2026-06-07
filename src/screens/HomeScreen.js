@@ -14,7 +14,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.badgeRow}>
           <Badge label="✓ Polls Open" type="success" />
           <Badge label="ID-Verified Voting" type="info" />
-          <Badge label="5 Races" type="muted" />
+          <Badge label="6 Races" type="muted" />
         </View>
       </View>
 
@@ -24,7 +24,8 @@ export default function HomeScreen({ navigation }) {
           { icon: '🏛️', race: 'President', scope: 'National' },
           { icon: '🏢', race: 'Governor', scope: 'County level' },
           { icon: '📜', race: 'Senator', scope: 'County level' },
-          { icon: '🗳️', race: 'Member of Parliament', scope: 'Constituency level' },
+          { icon: '🗳️', race: 'Women Representative', scope: 'County level' },
+          { icon: 'W', race: 'Member of Parliament', scope: 'Constituency level' },
           { icon: '🏘️', race: 'Member of County Assembly', scope: 'Ward level' },
         ].map((r, i) => (
           <View key={i} style={styles.raceRow}>

@@ -9,7 +9,8 @@
       },
       "cache": {
         "disabled": true
-      }
+      },
+      "channel": "preview"
     }
   }
 }

@@ -26,6 +26,12 @@
       "eas": {
         "projectId": "5f004280-abad-4063-8846-27a7899beddb"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5f004280-abad-4063-8846-27a7899beddb"
     }
   }
 }

@@ -8,6 +8,7 @@ import {
   getCountyCandidates,
   getMPCandidates,
   getMCACandidates,
+  getWomenRepCandidates,
 } from '../data/kenyaData';
 import { useElection } from '../context/ElectionContext';
 import { AppButton, Card, Badge, COLORS } from '../components/UI';
@@ -16,6 +17,7 @@ const RACE_COLORS = {
   president: '#1565C0',
   governor: '#2E7D32',
   senator: '#6A1B9A',
+  womenrep: '#AD1457',
   mp: '#E65100',
   mca: '#00695C',
 };
@@ -89,6 +91,7 @@ export default function BallotScreen({ navigation }) {
   }
 
   const countyCands = getCountyCandidates(voter.county);
+  const womenRepCands = getWomenRepCandidates(voter.county);
   const mpCands = getMPCandidates(voter.constituency);
   const mcaCands = getMCACandidates(voter.ward);
 
@@ -96,6 +99,7 @@ export default function BallotScreen({ navigation }) {
     { key: 'president', label: RACE_LABELS.president, candidates: PRESIDENTIAL_CANDIDATES },
     { key: 'governor', label: RACE_LABELS.governor, candidates: countyCands.governor },
     { key: 'senator', label: RACE_LABELS.senator, candidates: countyCands.senator },
+    { key: 'womenrep', label: RACE_LABELS.womenrep, candidates: womenRepCands },
     { key: 'mp', label: RACE_LABELS.mp, candidates: mpCands },
     { key: 'mca', label: RACE_LABELS.mca, candidates: mcaCands },
   ];
@@ -105,7 +109,7 @@ export default function BallotScreen({ navigation }) {
 
   function handleSubmit() {
     if (!allComplete) {
-      Alert.alert('Incomplete Ballot', `You have ${races.length - completedRaces} race(s) still unselected. Please complete all 5 races.`);
+      Alert.alert('Incomplete Ballot', `You have ${races.length - completedRaces} race(s) still unselected. Please complete all 6 races.`);
       return;
     }
     Alert.alert(
