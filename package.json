@@ -3,20 +3,20 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@react-native-picker/picker": "2.11.4",
     "@react-navigation/native": "^7.2.5",
     "@react-navigation/stack": "^7.9.3",
     "expo": "~56.0.9",
-    "expo-file-system": "^56.0.7",
-    "expo-sharing": "^56.0.16",
+    "expo-file-system": "~56.0.7",
+    "expo-sharing": "~56.0.16",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
     "react-native": "0.85.3",
-    "react-native-gesture-handler": "^3.0.0",
+    "react-native-gesture-handler": "~2.31.1",
     "react-native-reanimated": "^4.4.1",
     "react-native-safe-area-context": "^5.8.0",
     "react-native-screens": "^4.25.2",
-    "react-native-vector-icons": "^10.3.0",
-    "@react-native-picker/picker": "^2.7.5"
+    "react-native-vector-icons": "^10.3.0"
   },
   "scripts": {
     "start": "expo start",
@@ -26,7 +26,6 @@
   },
   "private": true,
   "description": "",
-  "devDependencies": {},
   "keywords": [],
   "author": "",
   "license": "ISC"
