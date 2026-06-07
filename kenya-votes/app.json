@@ -15,19 +15,10 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "package": "com.karlfenton.kenyavotes"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-sharing"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "5f004280-abad-4063-8846-27a7899beddb"
-      }
     }
   }
 }
