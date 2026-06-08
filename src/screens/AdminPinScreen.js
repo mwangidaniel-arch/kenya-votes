@@ -1,32 +1,38 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { ADMIN_PIN } from '../data/kenyaData';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
+import { supabase } from '../lib/supabase';
 import { AppButton, Card, COLORS } from '../components/UI';
 
 export default function AdminPinScreen({ navigation }) {
-  const [pin, setPin] = useState(['', '', '', '']);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const inputs = [useRef(), useRef(), useRef(), useRef()];
 
-  function handleChange(text, index) {
-    if (!/^\d?$/.test(text)) return;
-    const newPin = [...pin];
-    newPin[index] = text;
-    setPin(newPin);
+  async function handleLogin() {
     setError('');
-    if (text && index < 3) inputs[index + 1].current.focus();
-    if (!text && index > 0) inputs[index - 1].current.focus();
-    if (index === 3 && text) {
-      const entered = [...newPin.slice(0, 3), text].join('');
-      setTimeout(() => {
-        if (entered === ADMIN_PIN) {
-          navigation.navigate('Admin');
-        } else {
-          setError('Incorrect PIN. Try again.');
-          setPin(['', '', '', '']);
-          inputs[0].current.focus();
-        }
-      }, 100);
+    if (!email.trim()) { setError('Enter your email.'); return; }
+    if (!password) { setError('Enter your password.'); return; }
+
+    setLoading(true);
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (authError) {
+        setError('Invalid email or password.');
+        return;
+      }
+
+      if (data.user) {
+        navigation.navigate('Admin');
+      }
+    } catch (e) {
+      setError('Login failed. Check your connection.');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -34,45 +40,56 @@ export default function AdminPinScreen({ navigation }) {
     <View style={styles.container}>
       <Card style={styles.card}>
         <Text style={styles.lockIcon}>🔐</Text>
-        <Text style={styles.title}>Admin Access</Text>
-        <Text style={styles.subtitle}>Enter your 4-digit PIN to access the election dashboard</Text>
-        <View style={styles.pinRow}>
-          {pin.map((digit, i) => (
-            <TextInput
-              key={i}
-              ref={inputs[i]}
-              style={[styles.pinInput, error ? styles.pinError : {}]}
-              value={digit}
-              onChangeText={t => handleChange(t, i)}
-              keyboardType="numeric"
-              maxLength={1}
-              secureTextEntry
-              selectTextOnFocus
-            />
-          ))}
-        </View>
+        <Text style={styles.title}>Admin Login</Text>
+        <Text style={styles.subtitle}>Election officials only</Text>
+
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={v => { setEmail(v); setError(''); }}
+          placeholder="admin@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor={COLORS.textLight}
+        />
+
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={v => { setPassword(v); setError(''); }}
+          placeholder="Enter password"
+          secureTextEntry
+          placeholderTextColor={COLORS.textLight}
+        />
+
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Text style={styles.hint}>Demo PIN: 1234</Text>
-        <AppButton title="Cancel" onPress={() => navigation.goBack()} variant="outline" style={{ marginTop: 16 }} />
+
+        <AppButton
+          title={loading ? 'Logging in...' : 'Login'}
+          onPress={handleLogin}
+          loading={loading}
+          style={{ marginTop: 16 }}
+        />
+        <AppButton
+          title="Cancel"
+          onPress={() => navigation.goBack()}
+          variant="outline"
+          style={{ marginTop: 8 }}
+        />
       </Card>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F5F6FA', justifyContent: 'center', padding: 24 },
+  container: { flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', padding: 24 },
   card: { alignItems: 'center', padding: 28 },
   lockIcon: { fontSize: 32, marginBottom: 12 },
-  title: { fontSize: 20, fontWeight: '700', color: '#1A1A2E', marginBottom: 6 },
-  subtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 18, marginBottom: 24 },
-  pinRow: { flexDirection: 'row', gap: 12, marginBottom: 8 },
-  pinInput: {
-    width: 52, height: 60, borderRadius: 10,
-    borderWidth: 1.5, borderColor: '#E0E0E0',
-    fontSize: 24, fontWeight: '700', textAlign: 'center',
-    color: '#1A1A2E', backgroundColor: '#FAFAFA',
-  },
-  pinError: { borderColor: '#C62828', backgroundColor: '#FFEBEE' },
-  error: { color: '#C62828', fontSize: 13, marginTop: 4, textAlign: 'center' },
-  hint: { fontSize: 12, color: '#9CA3AF', marginTop: 12 },
+  title: { fontSize: 20, fontWeight: '700', color: COLORS.text, marginBottom: 4 },
+  subtitle: { fontSize: 13, color: COLORS.textMuted, marginBottom: 24 },
+  label: { fontSize: 13, color: COLORS.textMuted, marginBottom: 4, marginTop: 12, fontWeight: '500', alignSelf: 'flex-start', width: '100%' },
+  input: { width: '100%', borderWidth: 1, borderColor: COLORS.border, borderRadius: 8, padding: 12, fontSize: 15, color: COLORS.text, backgroundColor: '#FAFAFA' },
+  error: { color: COLORS.danger, fontSize: 13, marginTop: 8, textAlign: 'center' },
 });

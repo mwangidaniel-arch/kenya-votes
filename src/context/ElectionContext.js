@@ -54,7 +54,7 @@ export function ElectionProvider({ children }) {
         return false;
       }
       const { data: existing } = await supabase
-        .from('votes')
+        .from('voted_voters')
         .select('id')
         .eq('national_id', nationalId.trim())
         .single();
@@ -84,7 +84,6 @@ export function ElectionProvider({ children }) {
       const receiptId = 'RCT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
       const { error: voteError } = await supabase.from('votes').insert({
         receipt_id: receiptId,
-        national_id: voter.id,
         county: voter.county,
         constituency: voter.constituency,
         ward: voter.ward,
@@ -96,6 +95,7 @@ export function ElectionProvider({ children }) {
         mca: selections.mca,
       });
       if (voteError) throw voteError;
+      await supabase.from('voted_voters').insert({ national_id: voter.id, receipt_id: receiptId });
       await supabase.from('audit_log').insert({
         masked_id: voter.id.slice(0, 3) + 'XXXXX',
         county: voter.county,

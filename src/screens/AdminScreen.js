@@ -82,7 +82,7 @@ export default function AdminScreen({ navigation }) {
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity onPress={exportCSV} style={styles.iconBtn}><Text style={styles.iconBtnText}>Export CSV</Text></TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconBtn}><Text style={styles.iconBtnText}>Exit</Text></TouchableOpacity>
+          <TouchableOpacity onPress={async () => { await supabase.auth.signOut(); navigation.navigate('Home'); }} style={styles.iconBtn}><Text style={styles.iconBtnText}>Exit</Text></TouchableOpacity>
         </View>
       </View>
       <View style={styles.metrics}>
