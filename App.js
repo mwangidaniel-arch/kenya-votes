@@ -11,6 +11,7 @@ import ConfirmationScreen from './src/screens/ConfirmationScreen';
 import AdminPinScreen from './src/screens/AdminPinScreen';
 import AdminScreen from './src/screens/AdminScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
+import VoterImportScreen from './src/screens/VoterImportScreen';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,7 @@ export default function App() {
             <Stack.Screen name="Ballot" component={BallotScreen} options={{ title: 'Official Ballot', headerLeft: null }} />
             <Stack.Screen name="Confirmation" component={ConfirmationScreen} options={{ title: 'Vote Confirmed', headerLeft: null }} />
             <Stack.Screen name="AdminPin" component={AdminPinScreen} options={{ title: 'Admin Login' }} />
+            <Stack.Screen name="VoterImport" component={VoterImportScreen} options={{ title: 'Import Voters' }} />
             <Stack.Screen name="Admin" component={AdminScreen} options={{ title: 'Admin Dashboard', headerLeft: null }} />
           </Stack.Navigator>
         </NavigationContainer>

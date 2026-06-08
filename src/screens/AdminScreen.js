@@ -96,6 +96,7 @@ export default function AdminScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={exportCSV} style={styles.iconBtn}><Text style={styles.iconBtnText}>Export CSV</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('VoterImport')} style={styles.iconBtn}><Text style={styles.iconBtnText}>Import Voters</Text></TouchableOpacity>
           <TouchableOpacity onPress={async () => { await supabase.auth.signOut(); navigation.navigate('Home'); }} style={styles.iconBtn}><Text style={styles.iconBtnText}>Exit</Text></TouchableOpacity>
         </View>
       </View>
