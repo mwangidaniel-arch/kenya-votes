@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { AppButton, Badge, COLORS } from '../components/UI';
+import { useElectionSettings } from '../hooks/useElectionSettings';
 
 export default function HomeScreen({ navigation }) {
+  const { settings, loading } = useElectionSettings();
+  const pollsOpen = settings ? settings.polls_open : true;
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.hero}>
@@ -12,7 +15,7 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.title}>Kenya General Elections</Text>
         <Text style={styles.subtitle}>Independent Electoral and Boundaries Commission</Text>
         <View style={styles.badgeRow}>
-          <Badge label="✓ Polls Open" type="success" />
+          <Badge label={pollsOpen ? '✓ Polls Open' : '✗ Polls Closed'} type={pollsOpen ? 'success' : 'danger'} />
           <Badge label="ID-Verified Voting" type="info" />
           <Badge label="6 Races" type="muted" />
         </View>
@@ -40,7 +43,7 @@ export default function HomeScreen({ navigation }) {
 
       <AppButton
         title="Register as Voter"
-        onPress={() => navigation.navigate('Register')}
+        onPress={() => { if (!pollsOpen) { Alert.alert('Polls Closed', 'Voting is currently closed. Please check back later.'); return; } navigation.navigate('Register'); }}
         style={{ marginBottom: 12 }}
       />
       <AppButton

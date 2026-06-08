@@ -4,6 +4,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { supabase } from '../lib/supabase';
 import { COUNTIES, PRESIDENTIAL_CANDIDATES, getCountyCandidates } from '../data/kenyaData';
+import { useElectionSettings } from '../hooks/useElectionSettings';
 import { AppButton, Card, Badge, MetricCard, COLORS } from '../components/UI';
 
 const TABS = ['Results', 'Counties', 'Audit Log'];
@@ -23,6 +24,8 @@ export default function AdminScreen({ navigation }) {
   const [auditLog, setAuditLog] = useState([]);
   const [selectedCounty, setSelectedCounty] = useState('nairobi');
   const [loading, setLoading] = useState(true);
+  const { settings, togglePolls } = useElectionSettings();
+  const [toggling, setToggling] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -81,7 +84,18 @@ export default function AdminScreen({ navigation }) {
           <Text style={styles.headerTitle}>Election Dashboard</Text>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity onPress={exportCSV} style={styles.iconBtn}><Text style={styles.iconBtnText}>Export CSV</Text></TouchableOpacity>
+          <TouchableOpacity onPress={async () => {
+          if (!settings) return;
+          setToggling(true);
+          const { data } = await supabase.auth.getUser();
+          await togglePolls(settings.polls_open, data.user?.email);
+          setToggling(false);
+        }} style={[styles.iconBtn, { backgroundColor: settings?.polls_open ? '#FFEBEE' : '#E8F5E9' }]}>
+          <Text style={[styles.iconBtnText, { color: settings?.polls_open ? '#C62828' : '#2E7D32' }]}>
+            {toggling ? '...' : settings?.polls_open ? 'Close Polls' : 'Open Polls'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={exportCSV} style={styles.iconBtn}><Text style={styles.iconBtnText}>Export CSV</Text></TouchableOpacity>
           <TouchableOpacity onPress={async () => { await supabase.auth.signOut(); navigation.navigate('Home'); }} style={styles.iconBtn}><Text style={styles.iconBtnText}>Exit</Text></TouchableOpacity>
         </View>
       </View>

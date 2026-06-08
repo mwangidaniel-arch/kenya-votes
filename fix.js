@@ -1,15 +1,8 @@
 ﻿const fs = require('fs');
-let c = fs.readFileSync('src/screens/AdminScreen.js', 'utf8');
+let c = fs.readFileSync('src/hooks/useElectionSettings.js', 'utf8');
 c = c.replace(
-  "onPress={() => navigation.navigate('Home')}",
-  "onPress={async () => { await supabase.auth.signOut(); navigation.navigate('Home'); }}"
+  "const sub = supabase.channel('settings-channel')\n      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'election_settings' }, payload => {\n        setSettings(payload.new);\n      }).subscribe();",
+  "const sub = supabase.channel('settings-channel');\n    sub.on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'election_settings' }, payload => {\n      setSettings(payload.new);\n    }).subscribe();"
 );
-// Add supabase import if not present
-if (!c.includes("import { supabase }")) {
-  c = c.replace(
-    "import { supabase } from '../lib/supabase';",
-    "import { supabase } from '../lib/supabase';"
-  );
-}
-fs.writeFileSync('src/screens/AdminScreen.js', c, 'utf8');
+fs.writeFileSync('src/hooks/useElectionSettings.js', c, 'utf8');
 console.log('done');

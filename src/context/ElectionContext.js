@@ -37,6 +37,11 @@ export function ElectionProvider({ children }) {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: null });
     try {
+      const { data: settings } = await supabase.from('election_settings').select('polls_open').single();
+      if (settings && !settings.polls_open) {
+        dispatch({ type: 'SET_ERROR', payload: 'Polls are currently closed. Voting is not allowed.' });
+        return false;
+      }
       const { data, error } = await supabase
         .from('voters')
         .select('*')
